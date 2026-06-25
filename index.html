@@ -1,61 +1,213 @@
-
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Control Operativo Cilindros</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--font-sans);background:transparent;padding:1rem 0}
-h2{font-size:18px;font-weight:500;color:var(--color-text-primary);margin-bottom:1rem}
-.topbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-input,select{padding:7px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);font-size:14px;outline:none}
-input:focus{border-color:var(--color-border-primary)}
-button{padding:7px 12px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);cursor:pointer;background:var(--color-background-primary);color:var(--color-text-primary);font-size:14px;font-family:var(--font-sans)}
-button:hover{background:var(--color-background-secondary)}
-.list{display:flex;flex-direction:column;gap:8px}
-.card{background:var(--color-background-primary);padding:12px 14px;border-radius:var(--border-radius-lg);display:flex;justify-content:space-between;align-items:center;border-left:4px solid #ccc;border-top:0.5px solid var(--color-border-tertiary);border-right:0.5px solid var(--color-border-tertiary);border-bottom:0.5px solid var(--color-border-tertiary)}
-.pendiente{border-left-color:#BA7517}
-.enviada{border-left-color:#185FA5}
-.pagado{border-left-color:#3B6D11}
-.card-left{display:flex;flex-direction:column;gap:4px}
-.card-name{font-size:15px;font-weight:500;color:var(--color-text-primary)}
-.card-meta{font-size:12px;color:var(--color-text-secondary);display:flex;gap:10px;flex-wrap:wrap}
-.badge{font-size:11px;padding:2px 8px;border-radius:var(--border-radius-md);font-weight:500}
-.badge-pendiente{background:#FAEEDA;color:#633806}
-.badge-enviada{background:#E6F1FB;color:#0C447C}
-.badge-pagado{background:#EAF3DE;color:#27500A}
-.card-right{display:flex;gap:6px;align-items:center}
-.btn-sm{font-size:12px;padding:5px 10px}
-.btn-danger{border-color:var(--color-border-danger);color:var(--color-text-danger)}
-.btn-danger:hover{background:var(--color-background-danger)}
 
-.overlay{display:none;position:absolute;top:0;left:0;width:100%;min-height:100%;background:rgba(0,0,0,0.45);align-items:flex-start;justify-content:center;padding:2rem 1rem;z-index:100}
-.modal{background:var(--color-background-primary);width:100%;max-width:480px;border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);padding:1.25rem;display:flex;flex-direction:column;gap:1rem}
-.modal-header{display:flex;justify-content:space-between;align-items:center}
-.modal-title{font-size:16px;font-weight:500;color:var(--color-text-primary)}
-.close-btn{background:none;border:none;font-size:20px;cursor:pointer;color:var(--color-text-secondary);padding:0;line-height:1}
-.divider{height:0.5px;background:var(--color-border-tertiary)}
-.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.info-cell{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px}
-.info-label{font-size:11px;color:var(--color-text-secondary);margin-bottom:4px}
-.info-value{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+body{
+  font-family:Arial,sans-serif;
+  background:#f4f6f8;
+  padding:20px;
+  color:#222;
+}
+
+.container{max-width:900px;margin:auto}
+
+h2{font-size:20px;font-weight:600;margin-bottom:14px}
+
+.topbar{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:10px;
+}
+
+input{
+  padding:7px 10px;
+  border:1px solid #ccc;
+  border-radius:6px;
+  font-size:14px;
+  background:#fff;
+  color:#222;
+}
+
+input:focus{outline:none;border-color:#888}
+
+button{
+  padding:7px 12px;
+  border:1px solid #bbb;
+  border-radius:6px;
+  cursor:pointer;
+  background:#2d3436;
+  color:#fff;
+  font-size:14px;
+  font-family:Arial,sans-serif;
+}
+
+button:hover{opacity:0.85}
+
+/* LISTA */
+.list{display:flex;flex-direction:column;gap:8px}
+
+.card{
+  background:#fff;
+  padding:12px 14px;
+  border-radius:8px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  box-shadow:0 2px 5px rgba(0,0,0,0.07);
+  border-left:5px solid #ccc;
+}
+
+.pendiente{border-left-color:#f1c40f}
+.enviada{border-left-color:#3498db}
+.pagado{border-left-color:#2ecc71}
+
+.card-left{display:flex;flex-direction:column;gap:5px}
+.card-name{font-size:15px;font-weight:600}
+
+.card-meta{
+  font-size:12px;
+  color:#666;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+
+.badge{
+  font-size:11px;
+  padding:2px 8px;
+  border-radius:12px;
+  font-weight:600;
+}
+
+.badge-pendiente{background:#fef9e7;color:#9a7d0a;border:1px solid #f1c40f}
+.badge-enviada{background:#ebf5fb;color:#1a5276;border:1px solid #3498db}
+.badge-pagado{background:#eafaf1;color:#1e8449;border:1px solid #2ecc71}
+
+.card-right{display:flex;gap:6px;align-items:center}
+
+.btn-sm{
+  font-size:12px;
+  padding:5px 10px;
+  background:#444;
+  border-color:#333;
+}
+
+.btn-danger{
+  background:#e74c3c;
+  border-color:#c0392b;
+  color:#fff;
+}
+
+.btn-danger:hover{background:#c0392b}
+
+/* OVERLAY MODAL */
+.overlay{
+  display:none;
+  position:fixed;
+  top:0;left:0;
+  width:100%;height:100%;
+  background:rgba(0,0,0,0.5);
+  z-index:1000;
+  justify-content:center;
+  align-items:flex-start;
+  padding:40px 16px;
+}
+
+.modal{
+  background:#fff;
+  width:100%;
+  max-width:500px;
+  border-radius:12px;
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  max-height:90vh;
+  overflow-y:auto;
+}
+
+.modal-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.modal-title{font-size:17px;font-weight:600}
+
+.close-btn{
+  background:none;
+  border:none;
+  font-size:22px;
+  cursor:pointer;
+  color:#666;
+  padding:0;
+  line-height:1;
+}
+
+.close-btn:hover{color:#222}
+
+.divider{height:1px;background:#eee}
+
+.info-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+
+.info-cell{
+  background:#f8f9fa;
+  border-radius:6px;
+  padding:10px 12px;
+}
+
+.info-label{font-size:11px;color:#888;margin-bottom:4px}
+.info-value{font-size:15px;font-weight:600;color:#222}
+
 .actions{display:flex;gap:8px;flex-wrap:wrap}
+
 .cyl-list{display:flex;flex-direction:column;gap:6px}
-.cyl-row{display:flex;justify-content:space-between;align-items:center;background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 12px;font-size:14px}
-.cyl-name{color:var(--color-text-primary);font-weight:500}
-.cyl-qty{color:var(--color-text-secondary)}
-.empty{font-size:13px;color:var(--color-text-secondary);font-style:italic}
+
+.cyl-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:#f8f9fa;
+  border-radius:6px;
+  padding:8px 12px;
+  font-size:14px;
+}
+
+.cyl-name{font-weight:600;color:#222}
+.cyl-qty{color:#666}
+
+.empty{font-size:13px;color:#999;font-style:italic;padding:4px 0}
+
 .add-cyl{display:flex;gap:6px;margin-top:6px}
 .add-cyl input{flex:1}
 .add-cyl input[type=number]{width:80px;flex:none}
 
-#wrapper{position:relative}
+.section-title{font-size:14px;font-weight:600;margin-bottom:8px}
 </style>
+</head>
 
-<div id="wrapper">
-  <h2><i class="ti ti-tool" aria-hidden="true"></i> Control operativo</h2>
+<body>
+
+<div class="container">
+
+  <h2>🔧 Control Operativo Cilindros</h2>
 
   <div class="topbar">
     <input id="nombre" placeholder="Cliente" style="width:160px">
     <input id="pago" type="month" style="width:145px">
-    <input id="rotacion" type="number" placeholder="Tubos baja rot." style="width:140px" min="0">
-    <button onclick="addClient()"><i class="ti ti-plus" aria-hidden="true"></i> Agregar</button>
+    <input id="rotacion" type="number" placeholder="Tubos baja rot." style="width:145px" min="0">
+    <button onclick="addClient()">+ Agregar</button>
   </div>
 
   <div class="topbar">
@@ -64,54 +216,59 @@ button:hover{background:var(--color-background-secondary)}
 
   <div id="panel" class="list"></div>
 
-  <div class="overlay" id="overlay">
-    <div class="modal" id="modal">
-      <div class="modal-header">
-        <span class="modal-title" id="m-name"></span>
-        <button class="close-btn" onclick="closeModal()">&#10005;</button>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal">
+
+    <div class="modal-header">
+      <span class="modal-title" id="m-name"></span>
+      <button class="close-btn" onclick="closeModal()">&#10005;</button>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-cell">
+        <div class="info-label">Estado</div>
+        <div class="info-value" id="m-status"></div>
       </div>
-
-      <div class="info-grid">
-        <div class="info-cell">
-          <div class="info-label">Estado</div>
-          <div class="info-value" id="m-status"></div>
-        </div>
-        <div class="info-cell">
-          <div class="info-label">Pago hasta</div>
-          <div class="info-value" id="m-pay"></div>
-        </div>
-        <div class="info-cell">
-          <div class="info-label">Tubos baja rotación</div>
-          <div class="info-value" id="m-rot"></div>
-        </div>
-        <div class="info-cell">
-          <div class="info-label">Meses desde pago</div>
-          <div class="info-value" id="m-months"></div>
-        </div>
+      <div class="info-cell">
+        <div class="info-label">Pago hasta</div>
+        <div class="info-value" id="m-pay"></div>
       </div>
-
-      <div class="actions">
-        <button onclick="toggleStatus()"><i class="ti ti-refresh" aria-hidden="true"></i> Cambiar estado</button>
-        <button onclick="setPaid()"><i class="ti ti-check" aria-hidden="true"></i> Marcar pagado</button>
-        <button class="btn-danger" onclick="deleteClient()"><i class="ti ti-trash" aria-hidden="true"></i> Eliminar cliente</button>
+      <div class="info-cell">
+        <div class="info-label">Tubos baja rotación</div>
+        <div class="info-value" id="m-rot"></div>
       </div>
-
-      <div class="divider"></div>
-
-      <div>
-        <div style="font-size:14px;font-weight:500;color:var(--color-text-primary);margin-bottom:8px">Cilindros de gas</div>
-        <div class="cyl-list" id="m-cyl"></div>
-        <div class="add-cyl">
-          <input id="cyl-gas" placeholder="Tipo de gas">
-          <input id="cyl-qty" type="number" placeholder="Cant." min="1">
-          <button onclick="addCylinder()"><i class="ti ti-plus" aria-hidden="true"></i> Agregar</button>
-        </div>
+      <div class="info-cell">
+        <div class="info-label">Meses desde pago</div>
+        <div class="info-value" id="m-months"></div>
       </div>
     </div>
+
+    <div class="actions">
+      <button onclick="toggleStatus()">↻ Cambiar estado</button>
+      <button onclick="setPaid()">✔ Marcar pagado</button>
+      <button class="btn-danger" onclick="deleteClient()">🗑 Eliminar cliente</button>
+    </div>
+
+    <div class="divider"></div>
+
+    <div>
+      <div class="section-title">Cilindros de gas</div>
+      <div class="cyl-list" id="m-cyl"></div>
+      <div class="add-cyl">
+        <input id="cyl-gas" placeholder="Tipo de gas">
+        <input id="cyl-qty" type="number" placeholder="Cant." min="1">
+        <button onclick="addCylinder()">+ Agregar</button>
+      </div>
+    </div>
+
   </div>
 </div>
 
 <script>
+
 let clientes = [];
 try { clientes = JSON.parse(localStorage.getItem("clientes_v2")) || []; } catch(e){}
 let selected = null;
@@ -130,7 +287,7 @@ function mesesDesde(pagoHasta){
 
 function addClient(){
   const n = document.getElementById("nombre").value.trim();
-  if(!n) return;
+  if(!n){ alert("Ingresá el nombre del cliente."); return; }
   clientes.push({
     nombre: n,
     pagoHasta: document.getElementById("pago").value,
@@ -138,80 +295,89 @@ function addClient(){
     bajaRotacion: Number(document.getElementById("rotacion").value)||0,
     cilindros: []
   });
-  document.getElementById("nombre").value="";
-  document.getElementById("pago").value="";
-  document.getElementById("rotacion").value="";
-  save(); render();
+  document.getElementById("nombre").value = "";
+  document.getElementById("pago").value = "";
+  document.getElementById("rotacion").value = "";
+  save();
+  render();
 }
 
 function deleteClient(){
-  if(!confirm("¿Eliminar a "+clientes[selected].nombre+"?")) return;
-  clientes.splice(selected,1);
-  save(); closeModal(); render();
+  if(!confirm("¿Eliminar a " + clientes[selected].nombre + "? Esta acción no se puede deshacer.")) return;
+  clientes.splice(selected, 1);
+  save();
+  closeModal();
+  render();
 }
 
 function openModal(i){
   selected = i;
   const c = clientes[i];
-  document.getElementById("overlay").style.display="flex";
+  document.getElementById("overlay").style.display = "flex";
   document.getElementById("m-name").innerText = c.nombre;
   document.getElementById("m-status").innerText = c.estado;
-  document.getElementById("m-pay").innerText = c.pagoHasta||"-";
+  document.getElementById("m-pay").innerText = c.pagoHasta || "-";
   document.getElementById("m-rot").innerText = c.bajaRotacion + (c.bajaRotacion===1?" tubo":" tubos");
   document.getElementById("m-months").innerText = mesesDesde(c.pagoHasta);
   renderCylinders();
 }
 
 function closeModal(){
-  document.getElementById("overlay").style.display="none";
+  document.getElementById("overlay").style.display = "none";
 }
 
 document.getElementById("overlay").addEventListener("click", function(e){
-  if(e.target===this) closeModal();
+  if(e.target === this) closeModal();
 });
 
 function toggleStatus(){
-  const order=["Pendiente","Factura enviada","Pagado"];
-  let i = order.indexOf(clientes[selected].estado);
+  const order = ["Pendiente","Factura enviada","Pagado"];
+  const i = order.indexOf(clientes[selected].estado);
   clientes[selected].estado = order[(i+1)%3];
-  save(); render(); openModal(selected);
+  save();
+  render();
+  openModal(selected);
 }
 
 function setPaid(){
   const now = new Date();
-  const m = String(now.getMonth()+1).padStart(2,'0');
-  clientes[selected].estado="Pagado";
-  clientes[selected].pagoHasta=`${now.getFullYear()}-${m}`;
-  save(); render(); openModal(selected);
+  const m = String(now.getMonth()+1).padStart(2,"0");
+  clientes[selected].estado = "Pagado";
+  clientes[selected].pagoHasta = `${now.getFullYear()}-${m}`;
+  save();
+  render();
+  openModal(selected);
 }
 
 function addCylinder(){
   const gas = document.getElementById("cyl-gas").value.trim();
   const qty = Number(document.getElementById("cyl-qty").value);
-  if(!gas||!qty) return;
-  clientes[selected].cilindros.push({gas, cantidad:qty});
-  document.getElementById("cyl-gas").value="";
-  document.getElementById("cyl-qty").value="";
-  save(); renderCylinders();
+  if(!gas || !qty){ alert("Completá el tipo de gas y la cantidad."); return; }
+  clientes[selected].cilindros.push({ gas, cantidad: qty });
+  document.getElementById("cyl-gas").value = "";
+  document.getElementById("cyl-qty").value = "";
+  save();
+  renderCylinders();
 }
 
 function removeCylinder(i){
-  clientes[selected].cilindros.splice(i,1);
-  save(); renderCylinders();
+  clientes[selected].cilindros.splice(i, 1);
+  save();
+  renderCylinders();
 }
 
 function renderCylinders(){
   const c = clientes[selected];
   const div = document.getElementById("m-cyl");
   if(!c.cilindros.length){
-    div.innerHTML='<p class="empty">Sin cilindros cargados</p>';
+    div.innerHTML = '<p class="empty">Sin cilindros cargados.</p>';
     return;
   }
   div.innerHTML = c.cilindros.map((g,i)=>`
     <div class="cyl-row">
-      <span class="cyl-name"><i class="ti ti-cylinder" aria-hidden="true"></i> ${g.gas}</span>
+      <span class="cyl-name">⬡ ${g.gas}</span>
       <span class="cyl-qty">${g.cantidad} u.</span>
-      <button class="btn-sm btn-danger" onclick="removeCylinder(${i})"><i class="ti ti-trash" aria-hidden="true"></i></button>
+      <button class="btn-sm btn-danger" onclick="removeCylinder(${i})">🗑</button>
     </div>
   `).join("");
 }
@@ -219,34 +385,49 @@ function renderCylinders(){
 function render(){
   const panel = document.getElementById("panel");
   const q = document.getElementById("search").value.toLowerCase();
+
   const sorted = clientes
     .map((c,i)=>({c,i}))
     .sort((a,b)=>a.c.nombre.localeCompare(b.c.nombre));
 
-  panel.innerHTML="";
+  panel.innerHTML = "";
+
   sorted.forEach(({c,i})=>{
     if(q && !c.nombre.toLowerCase().includes(q)) return;
-    const cls = c.estado==="Pendiente"?"pendiente":c.estado==="Factura enviada"?"enviada":"pagado";
-    const badgeCls = cls==="pendiente"?"badge-pendiente":cls==="enviada"?"badge-enviada":"badge-pagado";
-    const totalTubos = c.cilindros.reduce((s,g)=>s+g.cantidad,0);
+
+    const cls =
+      c.estado==="Pendiente" ? "pendiente" :
+      c.estado==="Factura enviada" ? "enviada" : "pagado";
+
+    const badgeCls =
+      cls==="pendiente" ? "badge-pendiente" :
+      cls==="enviada" ? "badge-enviada" : "badge-pagado";
+
+    const totalTubos = c.cilindros.reduce((s,g)=>s+g.cantidad, 0);
     const meses = mesesDesde(c.pagoHasta);
-    panel.innerHTML+=`
+
+    panel.innerHTML += `
       <div class="card ${cls}">
         <div class="card-left">
           <div class="card-name">${c.nombre}</div>
           <div class="card-meta">
             <span class="badge ${badgeCls}">${c.estado}</span>
-            ${c.bajaRotacion>0?`<span><i class="ti ti-package" aria-hidden="true"></i> ${c.bajaRotacion} tubo${c.bajaRotacion===1?"":"s"} baja rot.</span>`:""}
-            ${totalTubos>0?`<span><i class="ti ti-cylinder" aria-hidden="true"></i> ${totalTubos} cilindro${totalTubos===1?"":"s"} total</span>`:""}
-            <span><i class="ti ti-calendar" aria-hidden="true"></i> ${meses}</span>
+            ${c.bajaRotacion>0 ? `<span>📦 ${c.bajaRotacion} tubo${c.bajaRotacion===1?"":"s"} baja rot.</span>` : ""}
+            ${totalTubos>0 ? `<span>⬡ ${totalTubos} cilindro${totalTubos===1?"":"s"} total</span>` : ""}
+            <span>📅 ${meses}</span>
           </div>
         </div>
-        <button class="btn-sm" onclick="openModal(${i})">Ver</button>
+        <div class="card-right">
+          <button class="btn-sm" onclick="openModal(${i})">Ver</button>
+        </div>
       </div>
     `;
   });
 }
 
 render();
+
 </script>
+
+</body>
 </html>
