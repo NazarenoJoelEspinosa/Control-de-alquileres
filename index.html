@@ -1,283 +1,252 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Control Operativo Cilindros</title>
 
 <style>
-body{
-  font-family: Arial;
-  background:#f4f6f8;
-  margin:0;
-  padding:20px;
-}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:transparent;padding:1rem 0}
+h2{font-size:18px;font-weight:500;color:var(--color-text-primary);margin-bottom:1rem}
+.topbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+input,select{padding:7px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);font-size:14px;outline:none}
+input:focus{border-color:var(--color-border-primary)}
+button{padding:7px 12px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);cursor:pointer;background:var(--color-background-primary);color:var(--color-text-primary);font-size:14px;font-family:var(--font-sans)}
+button:hover{background:var(--color-background-secondary)}
+.list{display:flex;flex-direction:column;gap:8px}
+.card{background:var(--color-background-primary);padding:12px 14px;border-radius:var(--border-radius-lg);display:flex;justify-content:space-between;align-items:center;border-left:4px solid #ccc;border-top:0.5px solid var(--color-border-tertiary);border-right:0.5px solid var(--color-border-tertiary);border-bottom:0.5px solid var(--color-border-tertiary)}
+.pendiente{border-left-color:#BA7517}
+.enviada{border-left-color:#185FA5}
+.pagado{border-left-color:#3B6D11}
+.card-left{display:flex;flex-direction:column;gap:4px}
+.card-name{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+.card-meta{font-size:12px;color:var(--color-text-secondary);display:flex;gap:10px;flex-wrap:wrap}
+.badge{font-size:11px;padding:2px 8px;border-radius:var(--border-radius-md);font-weight:500}
+.badge-pendiente{background:#FAEEDA;color:#633806}
+.badge-enviada{background:#E6F1FB;color:#0C447C}
+.badge-pagado{background:#EAF3DE;color:#27500A}
+.card-right{display:flex;gap:6px;align-items:center}
+.btn-sm{font-size:12px;padding:5px 10px}
+.btn-danger{border-color:var(--color-border-danger);color:var(--color-text-danger)}
+.btn-danger:hover{background:var(--color-background-danger)}
 
-.container{ max-width:900px; margin:auto; }
+.overlay{display:none;position:absolute;top:0;left:0;width:100%;min-height:100%;background:rgba(0,0,0,0.45);align-items:flex-start;justify-content:center;padding:2rem 1rem;z-index:100}
+.modal{background:var(--color-background-primary);width:100%;max-width:480px;border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);padding:1.25rem;display:flex;flex-direction:column;gap:1rem}
+.modal-header{display:flex;justify-content:space-between;align-items:center}
+.modal-title{font-size:16px;font-weight:500;color:var(--color-text-primary)}
+.close-btn{background:none;border:none;font-size:20px;cursor:pointer;color:var(--color-text-secondary);padding:0;line-height:1}
+.divider{height:0.5px;background:var(--color-border-tertiary)}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.info-cell{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px}
+.info-label{font-size:11px;color:var(--color-text-secondary);margin-bottom:4px}
+.info-value{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.cyl-list{display:flex;flex-direction:column;gap:6px}
+.cyl-row{display:flex;justify-content:space-between;align-items:center;background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 12px;font-size:14px}
+.cyl-name{color:var(--color-text-primary);font-weight:500}
+.cyl-qty{color:var(--color-text-secondary)}
+.empty{font-size:13px;color:var(--color-text-secondary);font-style:italic}
+.add-cyl{display:flex;gap:6px;margin-top:6px}
+.add-cyl input{flex:1}
+.add-cyl input[type=number]{width:80px;flex:none}
 
-h2{ margin-bottom:10px; }
-
-.topbar{
-  display:flex;
-  gap:6px;
-  flex-wrap:wrap;
-  margin-bottom:10px;
-}
-
-input{
-  padding:7px;
-  border:1px solid #ccc;
-  border-radius:6px;
-}
-
-button{
-  padding:7px 10px;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
-  background:#2d3436;
-  color:white;
-}
-
-button:hover{ opacity:0.85; }
-
-/* LISTA */
-.list{ display:flex; flex-direction:column; gap:8px; }
-
-.card{
-  background:white;
-  padding:10px;
-  border-radius:8px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  box-shadow:0 2px 5px rgba(0,0,0,0.08);
-}
-
-.pendiente{ border-left:5px solid #f1c40f; }
-.enviada{ border-left:5px solid #3498db; }
-.pagado{ border-left:5px solid #2ecc71; }
-
-.meta{ font-size:12px; color:#666; }
-
-.smallBtn{
-  font-size:12px;
-  padding:5px 8px;
-  background:#444;
-  margin-left:4px;
-}
-
-/* MODAL */
-.modal{
-  display:none;
-  position:fixed;
-  top:0; left:0;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.5);
-  justify-content:center;
-  align-items:center;
-}
-
-.modal-content{
-  background:white;
-  width:500px;
-  max-height:80vh;
-  overflow:auto;
-  padding:15px;
-  border-radius:10px;
-}
-
-.close{
-  float:right;
-  cursor:pointer;
-  font-size:18px;
-}
-
-.section{
-  margin-top:10px;
-  padding-top:10px;
-  border-top:1px solid #ddd;
-}
-
-.small{ font-size:12px; color:#666; }
+#wrapper{position:relative}
 </style>
-</head>
 
-<body>
+<div id="wrapper">
+  <h2><i class="ti ti-tool" aria-hidden="true"></i> Control operativo</h2>
 
-<div class="container">
+  <div class="topbar">
+    <input id="nombre" placeholder="Cliente" style="width:160px">
+    <input id="pago" type="month" style="width:145px">
+    <input id="rotacion" type="number" placeholder="Tubos baja rot." style="width:140px" min="0">
+    <button onclick="addClient()"><i class="ti ti-plus" aria-hidden="true"></i> Agregar</button>
+  </div>
 
-<h2>🔧 Control Operativo</h2>
+  <div class="topbar">
+    <input id="search" placeholder="Buscar cliente..." oninput="render()" style="width:220px">
+  </div>
 
-<div class="topbar">
-  <input id="nombre" placeholder="Cliente">
-  <input id="pago" type="month">
-  <input id="rotacion" type="number" placeholder="Rotación">
-  <button onclick="addClient()">Agregar</button>
-</div>
+  <div id="panel" class="list"></div>
 
-<div class="topbar">
-  <input id="search" placeholder="Buscar..." oninput="render()">
-</div>
+  <div class="overlay" id="overlay">
+    <div class="modal" id="modal">
+      <div class="modal-header">
+        <span class="modal-title" id="m-name"></span>
+        <button class="close-btn" onclick="closeModal()">&#10005;</button>
+      </div>
 
-<div id="panel" class="list"></div>
+      <div class="info-grid">
+        <div class="info-cell">
+          <div class="info-label">Estado</div>
+          <div class="info-value" id="m-status"></div>
+        </div>
+        <div class="info-cell">
+          <div class="info-label">Pago hasta</div>
+          <div class="info-value" id="m-pay"></div>
+        </div>
+        <div class="info-cell">
+          <div class="info-label">Tubos baja rotación</div>
+          <div class="info-value" id="m-rot"></div>
+        </div>
+        <div class="info-cell">
+          <div class="info-label">Meses desde pago</div>
+          <div class="info-value" id="m-months"></div>
+        </div>
+      </div>
 
-</div>
+      <div class="actions">
+        <button onclick="toggleStatus()"><i class="ti ti-refresh" aria-hidden="true"></i> Cambiar estado</button>
+        <button onclick="setPaid()"><i class="ti ti-check" aria-hidden="true"></i> Marcar pagado</button>
+        <button class="btn-danger" onclick="deleteClient()"><i class="ti ti-trash" aria-hidden="true"></i> Eliminar cliente</button>
+      </div>
 
-<!-- MODAL -->
-<div id="modal" class="modal">
-  <div class="modal-content">
-    <span class="close" onclick="closeModal()">✖</span>
+      <div class="divider"></div>
 
-    <h3 id="m-name"></h3>
-
-    <p class="small">Estado: <span id="m-status"></span></p>
-    <p class="small">Pago hasta: <span id="m-pay"></span></p>
-    <p class="small">Rotación: <span id="m-rot"></span></p>
-
-    <div class="section">
-      <button onclick="toggleStatus()">Cambiar estado</button>
-      <button onclick="setPaid()">Marcar pagado</button>
+      <div>
+        <div style="font-size:14px;font-weight:500;color:var(--color-text-primary);margin-bottom:8px">Cilindros de gas</div>
+        <div class="cyl-list" id="m-cyl"></div>
+        <div class="add-cyl">
+          <input id="cyl-gas" placeholder="Tipo de gas">
+          <input id="cyl-qty" type="number" placeholder="Cant." min="1">
+          <button onclick="addCylinder()"><i class="ti ti-plus" aria-hidden="true"></i> Agregar</button>
+        </div>
+      </div>
     </div>
-
-    <div class="section">
-      <h4>Cilindros</h4>
-      <button onclick="addGasModal()">+ Gas</button>
-      <div id="m-cyl"></div>
-    </div>
-
   </div>
 </div>
 
 <script>
-
-let clientes = JSON.parse(localStorage.getItem("clientes")) || [];
+let clientes = [];
+try { clientes = JSON.parse(localStorage.getItem("clientes_v2")) || []; } catch(e){}
 let selected = null;
 
-const save = () =>
-  localStorage.setItem("clientes", JSON.stringify(clientes));
+const save = () => localStorage.setItem("clientes_v2", JSON.stringify(clientes));
+
+function mesesDesde(pagoHasta){
+  if(!pagoHasta) return "-";
+  const [y,m] = pagoHasta.split("-").map(Number);
+  const now = new Date();
+  const diff = (now.getFullYear() - y)*12 + (now.getMonth()+1 - m);
+  if(diff < 0) return "Al día";
+  if(diff === 0) return "Este mes";
+  return diff + (diff===1?" mes":" meses");
+}
 
 function addClient(){
+  const n = document.getElementById("nombre").value.trim();
+  if(!n) return;
   clientes.push({
-    nombre:nombre.value,
-    pagoHasta:pago.value,
-    estado:"Pendiente",
-    bajaRotacion:Number(rotacion.value)||0,
-    cilindros:[]
+    nombre: n,
+    pagoHasta: document.getElementById("pago").value,
+    estado: "Pendiente",
+    bajaRotacion: Number(document.getElementById("rotacion").value)||0,
+    cilindros: []
   });
+  document.getElementById("nombre").value="";
+  document.getElementById("pago").value="";
+  document.getElementById("rotacion").value="";
+  save(); render();
+}
 
-  nombre.value="";
-  pago.value="";
-  rotacion.value="";
-
-  save();
-  render();
+function deleteClient(){
+  if(!confirm("¿Eliminar a "+clientes[selected].nombre+"?")) return;
+  clientes.splice(selected,1);
+  save(); closeModal(); render();
 }
 
 function openModal(i){
   selected = i;
   const c = clientes[i];
-
-  document.getElementById("modal").style.display="flex";
-
+  document.getElementById("overlay").style.display="flex";
   document.getElementById("m-name").innerText = c.nombre;
   document.getElementById("m-status").innerText = c.estado;
-  document.getElementById("m-pay").innerText = c.pagoHasta || "-";
-  document.getElementById("m-rot").innerText = c.bajaRotacion;
-
-  renderModal();
+  document.getElementById("m-pay").innerText = c.pagoHasta||"-";
+  document.getElementById("m-rot").innerText = c.bajaRotacion + (c.bajaRotacion===1?" tubo":" tubos");
+  document.getElementById("m-months").innerText = mesesDesde(c.pagoHasta);
+  renderCylinders();
 }
 
 function closeModal(){
-  document.getElementById("modal").style.display="none";
+  document.getElementById("overlay").style.display="none";
 }
+
+document.getElementById("overlay").addEventListener("click", function(e){
+  if(e.target===this) closeModal();
+});
 
 function toggleStatus(){
   const order=["Pendiente","Factura enviada","Pagado"];
   let i = order.indexOf(clientes[selected].estado);
   clientes[selected].estado = order[(i+1)%3];
-
-  save();
-  render();
-  openModal(selected);
+  save(); render(); openModal(selected);
 }
 
 function setPaid(){
   const now = new Date();
   const m = String(now.getMonth()+1).padStart(2,'0');
-  const y = now.getFullYear();
-
-  clientes[selected].estado = "Pagado";
-  clientes[selected].pagoHasta = `${y}-${m}`;
-
-  save();
-  render();
-  openModal(selected);
+  clientes[selected].estado="Pagado";
+  clientes[selected].pagoHasta=`${now.getFullYear()}-${m}`;
+  save(); render(); openModal(selected);
 }
 
-function addGasModal(){
-  const gas = prompt("Gas:");
-  const cant = prompt("Cantidad:");
-
-  clientes[selected].cilindros.push({
-    gas,
-    cantidad:Number(cant)
-  });
-
-  save();
-  renderModal();
+function addCylinder(){
+  const gas = document.getElementById("cyl-gas").value.trim();
+  const qty = Number(document.getElementById("cyl-qty").value);
+  if(!gas||!qty) return;
+  clientes[selected].cilindros.push({gas, cantidad:qty});
+  document.getElementById("cyl-gas").value="";
+  document.getElementById("cyl-qty").value="";
+  save(); renderCylinders();
 }
 
-function renderModal(){
+function removeCylinder(i){
+  clientes[selected].cilindros.splice(i,1);
+  save(); renderCylinders();
+}
+
+function renderCylinders(){
   const c = clientes[selected];
   const div = document.getElementById("m-cyl");
+  if(!c.cilindros.length){
+    div.innerHTML='<p class="empty">Sin cilindros cargados</p>';
+    return;
+  }
+  div.innerHTML = c.cilindros.map((g,i)=>`
+    <div class="cyl-row">
+      <span class="cyl-name"><i class="ti ti-cylinder" aria-hidden="true"></i> ${g.gas}</span>
+      <span class="cyl-qty">${g.cantidad} u.</span>
+      <button class="btn-sm btn-danger" onclick="removeCylinder(${i})"><i class="ti ti-trash" aria-hidden="true"></i></button>
+    </div>
+  `).join("");
+}
 
-  div.innerHTML = "";
+function render(){
+  const panel = document.getElementById("panel");
+  const q = document.getElementById("search").value.toLowerCase();
+  const sorted = clientes
+    .map((c,i)=>({c,i}))
+    .sort((a,b)=>a.c.nombre.localeCompare(b.c.nombre));
 
-  c.cilindros.forEach((g,i)=>{
-    div.innerHTML += `
-      <p>🧪 ${g.gas} - ${g.cantidad}</p>
+  panel.innerHTML="";
+  sorted.forEach(({c,i})=>{
+    if(q && !c.nombre.toLowerCase().includes(q)) return;
+    const cls = c.estado==="Pendiente"?"pendiente":c.estado==="Factura enviada"?"enviada":"pagado";
+    const badgeCls = cls==="pendiente"?"badge-pendiente":cls==="enviada"?"badge-enviada":"badge-pagado";
+    const totalTubos = c.cilindros.reduce((s,g)=>s+g.cantidad,0);
+    const meses = mesesDesde(c.pagoHasta);
+    panel.innerHTML+=`
+      <div class="card ${cls}">
+        <div class="card-left">
+          <div class="card-name">${c.nombre}</div>
+          <div class="card-meta">
+            <span class="badge ${badgeCls}">${c.estado}</span>
+            ${c.bajaRotacion>0?`<span><i class="ti ti-package" aria-hidden="true"></i> ${c.bajaRotacion} tubo${c.bajaRotacion===1?"":"s"} baja rot.</span>`:""}
+            ${totalTubos>0?`<span><i class="ti ti-cylinder" aria-hidden="true"></i> ${totalTubos} cilindro${totalTubos===1?"":"s"} total</span>`:""}
+            <span><i class="ti ti-calendar" aria-hidden="true"></i> ${meses}</span>
+          </div>
+        </div>
+        <button class="btn-sm" onclick="openModal(${i})">Ver</button>
+      </div>
     `;
   });
 }
 
-function render(){
-
-  const panel = document.getElementById("panel");
-  const q = search.value.toLowerCase();
-
-  panel.innerHTML = "";
-
-  clientes
-    .sort((a,b)=>a.nombre.localeCompare(b.nombre))
-    .forEach((c,i)=>{
-
-      if(q && !c.nombre.toLowerCase().includes(q)) return;
-
-      let cls =
-        c.estado==="Pendiente"?"pendiente":
-        c.estado==="Factura enviada"?"enviada":"pagado";
-
-      panel.innerHTML += `
-        <div class="card ${cls}">
-
-          <div>
-            <b>${c.nombre}</b>
-            <div class="meta">${c.estado} | ${c.pagoHasta||"-"}</div>
-          </div>
-
-          <div>
-            <button class="smallBtn" onclick="openModal(${i})">Ver</button>
-          </div>
-
-        </div>
-      `;
-    });
-}
-
 render();
-
 </script>
-
-</body>
 </html>
