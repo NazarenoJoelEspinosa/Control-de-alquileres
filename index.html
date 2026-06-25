@@ -6,7 +6,7 @@
 
 <style>
 body{
-  font-family: Arial, sans-serif;
+  font-family: Arial;
   background:#f4f6f8;
   margin:0;
   padding:20px;
@@ -18,24 +18,24 @@ body{
 }
 
 h2{
-  margin-bottom:15px;
+  margin-bottom:10px;
 }
 
 .topbar{
   display:flex;
-  gap:8px;
+  gap:6px;
   flex-wrap:wrap;
-  margin-bottom:15px;
+  margin-bottom:10px;
 }
 
 input{
-  padding:8px;
+  padding:7px;
   border:1px solid #ccc;
   border-radius:6px;
 }
 
 button{
-  padding:8px 10px;
+  padding:7px 10px;
   border:none;
   border-radius:6px;
   cursor:pointer;
@@ -43,45 +43,54 @@ button{
   color:white;
 }
 
-button:hover{
-  opacity:0.85;
+button:hover{ opacity:0.85; }
+
+.list{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
 }
 
+/* CARD COMPACTA */
 .card{
   background:white;
-  border-radius:10px;
-  padding:12px;
-  margin-bottom:10px;
+  padding:10px;
+  border-radius:8px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
   box-shadow:0 2px 5px rgba(0,0,0,0.08);
-  border-left:5px solid #bbb;
 }
 
-.status-pendiente{ border-left-color:#f1c40f; }
-.status-enviada{ border-left-color:#3498db; }
-.status-pagado{ border-left-color:#2ecc71; }
+/* estados */
+.pendiente{ border-left:5px solid #f1c40f; }
+.enviada{ border-left:5px solid #3498db; }
+.pagado{ border-left:5px solid #2ecc71; }
+
+.left{
+  display:flex;
+  flex-direction:column;
+}
+
+.name{
+  font-weight:bold;
+}
 
 .meta{
-  font-size:13px;
-  color:#555;
-  margin:4px 0;
+  font-size:12px;
+  color:#666;
 }
 
 .actions{
   display:flex;
-  flex-wrap:wrap;
   gap:5px;
-  margin:8px 0;
+  align-items:center;
 }
 
-.actions button{
+.smallBtn{
   font-size:12px;
-  padding:6px 8px;
+  padding:5px 8px;
   background:#444;
-}
-
-.list{
-  font-size:13px;
-  margin-top:8px;
 }
 </style>
 </head>
@@ -90,16 +99,20 @@ button:hover{
 
 <div class="container">
 
-<h2>Control de Cilindros</h2>
+<h2>🔧 Control Operativo</h2>
 
 <div class="topbar">
   <input id="nombre" placeholder="Cliente">
   <input id="pago" type="month">
-  <input id="rotacion" type="number" placeholder="Baja rotación">
+  <input id="rotacion" type="number" placeholder="Rotación">
   <button onclick="addClient()">Agregar</button>
 </div>
 
-<div id="panel"></div>
+<div class="topbar">
+  <input id="search" placeholder="Buscar cliente..." oninput="render()">
+</div>
+
+<div id="panel" class="list"></div>
 
 </div>
 
@@ -129,8 +142,13 @@ function addClient(){
   render();
 }
 
-function setStatus(i, st){
-  clientes[i].estado = st;
+/* 🔘 TOGGLE ESTADO */
+function toggleStatus(i){
+  const order = ["Pendiente","Factura enviada","Pagado"];
+  let idx = order.indexOf(clientes[i].estado);
+  idx = (idx + 1) % order.length;
+  clientes[i].estado = order[idx];
+
   save();
   render();
 }
@@ -143,7 +161,7 @@ function addGas(i){
 
   clientes[i].cilindros.push({
     gas,
-    cantidad: Number(cant)
+    cantidad:Number(cant)
   });
 
   save();
@@ -151,8 +169,8 @@ function addGas(i){
 }
 
 function editRotation(i){
-  const r = prompt("Baja rotación:", clientes[i].bajaRotacion);
-  clientes[i].bajaRotacion = Number(r) || 0;
+  const r = prompt("Rotación:", clientes[i].bajaRotacion);
+  clientes[i].bajaRotacion = Number(r)||0;
 
   save();
   render();
@@ -166,51 +184,47 @@ function removeClient(i){
   }
 }
 
-function statusClass(st){
-  if(st==="Pendiente") return "status-pendiente";
-  if(st==="Factura enviada") return "status-enviada";
-  if(st==="Pagado") return "status-pagado";
-  return "";
-}
-
 function render(){
 
   const panel = document.getElementById("panel");
+  const q = document.getElementById("search").value.toLowerCase();
+
   panel.innerHTML = "";
 
   clientes
     .sort((a,b)=>a.nombre.localeCompare(b.nombre))
     .forEach((c,i)=>{
 
+      if(q && !c.nombre.toLowerCase().includes(q)) return;
+
+      let className =
+        c.estado==="Pendiente" ? "pendiente" :
+        c.estado==="Factura enviada" ? "enviada" :
+        "pagado";
+
       let html = `
-        <div class="card ${statusClass(c.estado)}">
+        <div class="card ${className}">
 
-          <b>${c.nombre}</b>
-
-          <div class="meta">📌 ${c.estado}</div>
-          <div class="meta">💰 ${c.pagoHasta || "-"}</div>
-          <div class="meta">🔄 Rotación: ${c.bajaRotacion}</div>
-
-          <div class="actions">
-            <button onclick="setStatus(${i},'Pendiente')">Pendiente</button>
-            <button onclick="setStatus(${i},'Factura enviada')">Factura enviada</button>
-            <button onclick="setStatus(${i},'Pagado')">Pagado</button>
+          <div class="left">
+            <div class="name">${c.nombre}</div>
+            <div class="meta">💰 ${c.pagoHasta || "-"}</div>
+            <div class="meta">🔄 Rotación: ${c.bajaRotacion}</div>
           </div>
 
           <div class="actions">
-            <button onclick="addGas(${i})">+ Gas</button>
-            <button onclick="editRotation(${i})">Rotación</button>
-            <button onclick="removeClient(${i})">Eliminar</button>
+
+            <button class="smallBtn" onclick="toggleStatus(${i})">
+              ${c.estado}
+            </button>
+
+            <button class="smallBtn" onclick="addGas(${i})">Gas</button>
+            <button class="smallBtn" onclick="editRotation(${i})">Rot</button>
+            <button class="smallBtn" onclick="removeClient(${i})">X</button>
+
           </div>
 
-          <div class="list">
+        </div>
       `;
-
-      c.cilindros.forEach(g=>{
-        html += `• ${g.gas} (${g.cantidad})<br>`;
-      });
-
-      html += `</div></div>`;
 
       panel.innerHTML += html;
   });
