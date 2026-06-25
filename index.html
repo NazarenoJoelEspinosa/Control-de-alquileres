@@ -6,84 +6,98 @@
 
 <style>
 body{
-  font-family: Arial;
-  margin: 20px;
-  background: #eef1f5;
+  font-family: Arial, sans-serif;
+  background:#f4f6f8;
+  margin:0;
+  padding:20px;
 }
 
-.panel{
-  max-width: 900px;
-  margin: auto;
+.container{
+  max-width:900px;
+  margin:auto;
 }
 
-input, button{
-  padding: 7px;
-  margin: 4px;
+h2{
+  margin-bottom:15px;
 }
 
-.cliente{
-  background: white;
-  padding: 15px;
-  margin-top: 10px;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  border-left: 6px solid #ccc;
+.topbar{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:15px;
 }
 
-.mora{ border-left: 6px solid #e74c3c; }
-
-.pendiente{ background:#fff3cd; }
-.enviada{ background:#cfe2ff; }
-.pagado{ background:#d1e7dd; }
+input{
+  padding:8px;
+  border:1px solid #ccc;
+  border-radius:6px;
+}
 
 button{
-  border: none;
-  cursor: pointer;
-  border-radius: 5px;
-  background: #333;
-  color: white;
-  padding: 6px 10px;
+  padding:8px 10px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  background:#2d3436;
+  color:white;
 }
 
-button:hover{ opacity: 0.8; }
-
-.ph-vencido{ color:red; font-weight:bold; }
-.ph-ok{ color:green; }
-
-.small{ font-size: 12px; color: #666; }
-
-.abc-bar{
-  margin: 10px 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
+button:hover{
+  opacity:0.85;
 }
 
-.abc-bar button{
-  background:#555;
-  font-size: 12px;
-  padding: 4px 7px;
+.card{
+  background:white;
+  border-radius:10px;
+  padding:12px;
+  margin-bottom:10px;
+  box-shadow:0 2px 5px rgba(0,0,0,0.08);
+  border-left:5px solid #bbb;
+}
+
+.status-pendiente{ border-left-color:#f1c40f; }
+.status-enviada{ border-left-color:#3498db; }
+.status-pagado{ border-left-color:#2ecc71; }
+
+.meta{
+  font-size:13px;
+  color:#555;
+  margin:4px 0;
+}
+
+.actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+  margin:8px 0;
+}
+
+.actions button{
+  font-size:12px;
+  padding:6px 8px;
+  background:#444;
+}
+
+.list{
+  font-size:13px;
+  margin-top:8px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="panel">
+<div class="container">
 
-<h2>🔧 Control de Cilindros</h2>
+<h2>Control de Cilindros</h2>
 
-<input id="nombre" placeholder="Cliente">
-<input id="pago" type="month">
-<button onclick="agregarCliente()">Agregar</button>
-
-<br>
-
-<input id="buscador" oninput="render()" placeholder="Buscar cliente...">
-
-<div class="abc-bar" id="abc"></div>
-
-<hr>
+<div class="topbar">
+  <input id="nombre" placeholder="Cliente">
+  <input id="pago" type="month">
+  <input id="rotacion" type="number" placeholder="Baja rotación">
+  <button onclick="addClient()">Agregar</button>
+</div>
 
 <div id="panel"></div>
 
@@ -92,150 +106,116 @@ button:hover{ opacity: 0.8; }
 <script>
 
 let clientes = JSON.parse(localStorage.getItem("clientes")) || [];
-let filtroLetra = "";
-let busqueda = "";
 
-function guardar(){
+const save = () =>
   localStorage.setItem("clientes", JSON.stringify(clientes));
-}
 
-function mesesAtras(fecha){
-  if(!fecha) return 0;
-  const hoy = new Date();
-  const [y,m] = fecha.split("-");
-  return (hoy.getFullYear()-y)*12 + (hoy.getMonth()+1-m);
-}
+function addClient(){
+  if(!nombre.value) return;
 
-// 🔥 letras A-Z
-function renderABC(){
-  const abc = document.getElementById("abc");
-  const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-
-  abc.innerHTML = letras.map(l =>
-    `<button onclick="setLetra('${l}')">${l}</button>`
-  ).join("") + `<button onclick="setLetra('')">Todos</button>`;
-}
-
-function setLetra(l){
-  filtroLetra = l;
-  render();
-}
-
-function agregarCliente(){
   clientes.push({
-    nombre: document.getElementById("nombre").value,
-    pagoHasta: document.getElementById("pago").value,
+    nombre: nombre.value,
+    pagoHasta: pago.value,
     estado: "Pendiente",
+    bajaRotacion: Number(rotacion.value) || 0,
     cilindros: []
   });
 
-  guardar();
+  nombre.value="";
+  pago.value="";
+  rotacion.value="";
+
+  save();
   render();
 }
 
-function cambiarEstado(i, estado){
-  clientes[i].estado = estado;
-  guardar();
+function setStatus(i, st){
+  clientes[i].estado = st;
+  save();
   render();
 }
 
-function agregarGas(i){
+function addGas(i){
   const gas = prompt("Gas:");
   const cant = prompt("Cantidad:");
-  const ph = prompt("PH (YYYY-MM):");
 
-  clientes[i].cilindros.push({ gas, cantidad: parseInt(cant), ph });
+  if(!gas || !cant) return;
 
-  guardar();
+  clientes[i].cilindros.push({
+    gas,
+    cantidad: Number(cant)
+  });
+
+  save();
   render();
 }
 
-function editarCliente(i){
-  const c = clientes[i];
+function editRotation(i){
+  const r = prompt("Baja rotación:", clientes[i].bajaRotacion);
+  clientes[i].bajaRotacion = Number(r) || 0;
 
-  const n = prompt("Nombre:", c.nombre);
-  const p = prompt("Pago hasta:", c.pagoHasta);
-
-  if(n) c.nombre = n;
-  if(p) c.pagoHasta = p;
-
-  guardar();
+  save();
   render();
 }
 
-function eliminarCliente(i){
-  if(confirm("¿Eliminar cliente?")){
+function removeClient(i){
+  if(confirm("Eliminar cliente?")){
     clientes.splice(i,1);
-    guardar();
+    save();
     render();
   }
+}
+
+function statusClass(st){
+  if(st==="Pendiente") return "status-pendiente";
+  if(st==="Factura enviada") return "status-enviada";
+  if(st==="Pagado") return "status-pagado";
+  return "";
 }
 
 function render(){
 
   const panel = document.getElementById("panel");
-  const buscador = document.getElementById("buscador").value.toLowerCase();
-
-  busqueda = buscador;
-
   panel.innerHTML = "";
 
-  renderABC();
+  clientes
+    .sort((a,b)=>a.nombre.localeCompare(b.nombre))
+    .forEach((c,i)=>{
 
-  // 🔥 ordenar A-Z
-  clientes.sort((a,b)=>a.nombre.localeCompare(b.nombre));
+      let html = `
+        <div class="card ${statusClass(c.estado)}">
 
-  clientes.forEach((c,i)=>{
+          <b>${c.nombre}</b>
 
-    // filtros
-    if(filtroLetra && !c.nombre.toUpperCase().startsWith(filtroLetra)) return;
-    if(busqueda && !c.nombre.toLowerCase().includes(busqueda)) return;
+          <div class="meta">📌 ${c.estado}</div>
+          <div class="meta">💰 ${c.pagoHasta || "-"}</div>
+          <div class="meta">🔄 Rotación: ${c.bajaRotacion}</div>
 
-    const deuda = mesesAtras(c.pagoHasta);
+          <div class="actions">
+            <button onclick="setStatus(${i},'Pendiente')">Pendiente</button>
+            <button onclick="setStatus(${i},'Factura enviada')">Factura enviada</button>
+            <button onclick="setStatus(${i},'Pagado')">Pagado</button>
+          </div>
 
-    let estadoClass = "";
-    if(c.estado === "Pendiente") estadoClass = "pendiente";
-    if(c.estado === "Factura enviada") estadoClass = "enviada";
-    if(c.estado === "Pagado") estadoClass = "pagado";
+          <div class="actions">
+            <button onclick="addGas(${i})">+ Gas</button>
+            <button onclick="editRotation(${i})">Rotación</button>
+            <button onclick="removeClient(${i})">Eliminar</button>
+          </div>
 
-    let html = `
-      <div class="cliente ${deuda>=3?'mora':''} ${estadoClass}">
-        <h3>${c.nombre}</h3>
-
-        <p class="small">💰 Meses atrasados: <b>${deuda}</b></p>
-        <p class="small">📌 Estado: <b>${c.estado}</b></p>
-
-        <button onclick="cambiarEstado(${i},'Pendiente')">Pendiente</button>
-        <button onclick="cambiarEstado(${i},'Factura enviada')">Factura enviada</button>
-        <button onclick="cambiarEstado(${i},'Pagado')">Pagado</button>
-
-        <br><br>
-
-        <button onclick="agregarGas(${i})">+ Gas</button>
-        <button onclick="editarCliente(${i})">Editar</button>
-        <button onclick="eliminarCliente(${i})">Eliminar</button>
-
-        <ul>
-    `;
-
-    c.cilindros.forEach(g=>{
-      const vencido = mesesAtras(g.ph) > 0;
-
-      html += `
-        <li>
-          🧪 ${g.gas} - ${g.cantidad}
-          | PH: <span class="${vencido?'ph-vencido':'ph-ok'}">${g.ph}</span>
-        </li>
+          <div class="list">
       `;
-    });
 
-    html += "</ul></div>";
+      c.cilindros.forEach(g=>{
+        html += `• ${g.gas} (${g.cantidad})<br>`;
+      });
 
-    panel.innerHTML += html;
+      html += `</div></div>`;
+
+      panel.innerHTML += html;
   });
 }
 
-renderABC();
 render();
 
 </script>
